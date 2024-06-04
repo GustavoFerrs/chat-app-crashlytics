@@ -1,20 +1,22 @@
+import 'package:chat_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'app.dart';
 
-const options = FirebaseOptions(
-  apiKey: "AIzaSyBZ6TmE6ZsVi7bmyUyz81_oKmYY-EM7hlE",
-  authDomain: "chat-app-544f1.firebaseapp.com",
-  projectId: "chat-app-544f1",
-  storageBucket: "chat-app-544f1.appspot.com",
-  messagingSenderId: "120176576063",
-  appId: "1:120176576063:web:62a4059f3be45497921a8a"
-);
-
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Firebase.initializeApp(options: options);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
+  FlutterError.onError = (errorDetails) {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+    };
+    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
   runApp(const App());
 }
 
